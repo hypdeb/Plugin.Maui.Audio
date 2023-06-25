@@ -8,25 +8,27 @@ internal sealed class AndroidAudioPlayer : IAudioPlayer
 {
 	private readonly MediaPlayer player;
 
-	private readonly MemoryStream stream;
+	private MemoryStream stream;
 
-	internal AndroidAudioPlayer(Stream audioStream)
+	internal AndroidAudioPlayer()
 	{
 		this.player = new MediaPlayer();
-		this.stream = new MemoryStream();
-		try
-		{
-			audioStream.CopyToAsync(this.stream);
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Exception: {ex}");
-		}
+	}
 
+	public async Task SetAndPrepareAsync(Stream audioStream)
+	{
+		this.stream = new MemoryStream();
+		await audioStream.CopyToAsync(this.stream).ConfigureAwait(false);
 		var mediaDataSource = new StreamMediaDataSource(this.stream);
-		this.player.SetDataSource(mediaDataSource);
+		await this.player.SetDataSourceAsync(mediaDataSource).ConfigureAwait(false);
 		this.player.Looping = true;
+		var taskCompletionSource = new TaskCompletionSource();
+		this.player.Prepared += (sender, args) =>
+		{
+			taskCompletionSource.SetResult();
+		};
 		this.player.Prepare();
+		await taskCompletionSource.Task.ConfigureAwait(false);
 	}
 
 	public bool IsPlaying => this.player.IsPlaying;

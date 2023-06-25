@@ -1,4 +1,6 @@
-﻿namespace Plugin.Maui.Audio;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace Plugin.Maui.Audio;
 
 public static class AudioExtensions
 {
