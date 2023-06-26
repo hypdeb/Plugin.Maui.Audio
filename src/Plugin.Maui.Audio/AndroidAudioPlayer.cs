@@ -8,8 +8,6 @@ internal sealed class AndroidAudioPlayer : IAudioPlayer
 {
 	private readonly MediaPlayer player;
 
-	private MemoryStream stream;
-
 	internal AndroidAudioPlayer()
 	{
 		this.player = new MediaPlayer();
@@ -17,9 +15,7 @@ internal sealed class AndroidAudioPlayer : IAudioPlayer
 
 	public async Task SetAndPrepareAsync(Stream audioStream)
 	{
-		this.stream = new MemoryStream();
-		await audioStream.CopyToAsync(this.stream).ConfigureAwait(false);
-		var mediaDataSource = new StreamMediaDataSource(this.stream);
+		var mediaDataSource = new StreamMediaDataSource(audioStream);
 		await this.player.SetDataSourceAsync(mediaDataSource).ConfigureAwait(false);
 		this.player.Looping = true;
 		var taskCompletionSource = new TaskCompletionSource();
@@ -58,7 +54,6 @@ internal sealed class AndroidAudioPlayer : IAudioPlayer
 	{
 		this.player.Release();
 		this.player.Dispose();
-		this.stream.Dispose();
 	}
 
 	private void SetVolume(double volume)

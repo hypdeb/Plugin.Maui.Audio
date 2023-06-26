@@ -3,7 +3,7 @@
 /// <summary>
 /// Provides the ability to create <see cref="IAudioPlayer" /> instances.
 /// </summary>
-public interface IAudioManager
+public interface IAudioPlayerFactory
 {
 	/// <summary>
 	/// Creates a new <see cref="IAudioPlayer" /> with the supplied <paramref name="audioStream" /> ready to play.
@@ -13,7 +13,7 @@ public interface IAudioManager
 	Task<IAudioPlayer> CreatePlayerAsync(Stream audioStream);
 }
 
-public sealed class AudioManager : IAudioManager
+public sealed class AudioPlayerFactory : IAudioPlayerFactory
 {
 	/// <inheritdoc />
 	public async Task<IAudioPlayer> CreatePlayerAsync(Stream audioStream)

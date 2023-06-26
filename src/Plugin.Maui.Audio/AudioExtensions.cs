@@ -6,7 +6,7 @@ public static class AudioExtensions
 {
 	public static IServiceCollection AddMauiAudioPlugin(this IServiceCollection services)
 	{
-		services.AddSingleton<IAudioManager, AudioManager>();
+		services.AddSingleton<IAudioPlayerFactory, AudioPlayerFactory>();
 		return services;
 	}
 }
