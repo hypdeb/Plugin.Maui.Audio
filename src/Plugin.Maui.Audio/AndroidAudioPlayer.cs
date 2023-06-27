@@ -13,20 +13,6 @@ internal sealed class AndroidAudioPlayer : IAudioPlayer
 		this.player = new MediaPlayer();
 	}
 
-	public async Task SetAndPrepareAsync(Stream audioStream)
-	{
-		var mediaDataSource = new StreamMediaDataSource(audioStream);
-		await this.player.SetDataSourceAsync(mediaDataSource).ConfigureAwait(false);
-		this.player.Looping = true;
-		var taskCompletionSource = new TaskCompletionSource();
-		this.player.Prepared += (sender, args) =>
-		{
-			taskCompletionSource.SetResult();
-		};
-		this.player.Prepare();
-		await taskCompletionSource.Task.ConfigureAwait(false);
-	}
-
 	public bool IsPlaying => this.player.IsPlaying;
 
 	public double Volume
@@ -56,6 +42,17 @@ internal sealed class AndroidAudioPlayer : IAudioPlayer
 		this.player.Dispose();
 	}
 
+	public async Task SetAndPrepareAsync(Stream audioStream)
+	{
+		var mediaDataSource = new StreamMediaDataSource(audioStream);
+		await this.player.SetDataSourceAsync(mediaDataSource).ConfigureAwait(false);
+		this.player.Looping = true;
+		var taskCompletionSource = new TaskCompletionSource();
+		this.player.Prepared += (sender, args) => { taskCompletionSource.SetResult(); };
+		this.player.Prepare();
+		await taskCompletionSource.Task.ConfigureAwait(false);
+	}
+
 	private void SetVolume(double volume)
 	{
 		volume = Math.Clamp(volume, 0, 1);
@@ -68,4 +65,5 @@ internal sealed class AndroidAudioPlayer : IAudioPlayer
 		this.player.SetVolume((float) left, (float) right);
 	}
 }
+
 #endif
